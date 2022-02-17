@@ -241,15 +241,28 @@ public class MainActivity extends FlutterActivity {
 
     }
     public  ArrayList<HashMap>  getDataUsageData() {
-        DataUsagesInformation dataUsagesInformation = new DataUsagesInformation(this);
-        DataUsagesData dataUsagesData = dataUsagesInformation.getInternetUsage(1642694075000L);
         ArrayList<HashMap> result = new ArrayList<>();
-        HashMap downWifi = new HashMap();
-        downWifi.put("'downWifi'",dataUsagesData.getWifiDataDownload() / (1024f * 1024f) + " MB");
-        downWifi.put("'upWifi'",dataUsagesData.getWifiDataUpload() / (1024f * 1024f) + " MB");
-        downWifi.put("'downMobi'",dataUsagesData.getMobileDataDownload() / (1024f * 1024f) + " MB");
-        downWifi.put("'upMobi'",dataUsagesData.getMobileDataUpload() / (1024f * 1024f) + " MB");
-        result.add(downWifi);
+        if (checkUserStatePermission()) {
+            startActivityForResult(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS), 1);
+
+        } else {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE
+                }, 2);
+            }
+            else {
+                DataUsagesInformation dataUsagesInformation = new DataUsagesInformation(this);
+                DataUsagesData dataUsagesData = dataUsagesInformation.getInternetUsage(1642694075000L);
+
+                HashMap downWifi = new HashMap();
+                downWifi.put("'downWifi'", dataUsagesData.getWifiDataDownload() / (1024f * 1024f) + " MB");
+                downWifi.put("'upWifi'", dataUsagesData.getWifiDataUpload() / (1024f * 1024f) + " MB");
+                downWifi.put("'downMobi'", dataUsagesData.getMobileDataDownload() / (1024f * 1024f) + " MB");
+                downWifi.put("'upMobi'", dataUsagesData.getMobileDataUpload() / (1024f * 1024f) + " MB");
+                result.add(downWifi);
+                return result;
+            }
+        }
         return result;
     }
     public  ArrayList<HashMap>  getAppInstalls() {
